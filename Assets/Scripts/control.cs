@@ -24,28 +24,28 @@ public class control : MonoBehaviour
     private void Update()
     {
         Direction forbiddenDirection = snakeScript.GetForbiddenDirection();
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKey(KeyCode.W))
         {
             if (forbiddenDirection != Direction.Up)
             {
                 direction = Direction.Up;
             }
         }
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKey(KeyCode.A))
         {
             if (forbiddenDirection != Direction.Left)
             {
                 direction = Direction.Left;
             }
         }
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKey(KeyCode.S))
         {
             if (forbiddenDirection != Direction.Down)
             {
                 direction = Direction.Down;
             }
         }
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKey(KeyCode.D))
         {
             if (forbiddenDirection != Direction.Right)
             {
