@@ -5,11 +5,13 @@ using UnityEngine;
 
 public class field : MonoBehaviour
 {
-    [SerializeField] private int _fieldSize;
+    [SerializeField] public int _fieldSize;
     [SerializeField] private GameObject _fieldCellContainer;
     [SerializeField] private Color _primaryColor;
     [SerializeField] private Color _secondaryColor;
-    
+
+    public List<Vector2> cellPositions;
+
     public float GetCellSize()
     {
         return transform.localScale.x / _fieldSize;
@@ -30,34 +32,34 @@ public class field : MonoBehaviour
                 cellsPositions.Add(new Vector2(leftTopCornerPosition.x + cellSize * j * parentScale.x, leftTopCornerPosition.y + cellSize * (i + 1) * parentScale.y));
             }
         }
-        Debug.Log(cellsPositions.Count);
         return cellsPositions;
     }
 
-    private void Start()
+    public Vector2 GetCellPosition(int x, int y) { return cellPositions[y * _fieldSize + x]; }
+
+    private void Awake()
     {
+        cellPositions = GetCellsPositions();
         gameObject.GetComponent<SpriteRenderer>().color = _primaryColor;
         float cellSize = GetCellSize();
 
-        bool isEvenCell = true;
-        foreach(Vector2 cellPosition in GetCellsPositions())
+        for(int i = 0; i < cellPositions.Count; i++)
         {
-            if(isEvenCell)
-            {
-                GameObject createdCellContainer = Instantiate(
+            int row = i / _fieldSize + 1;
+            int col = i % _fieldSize;
+
+            if ((row % 2 == 0) && (col % 2 == 0)) continue;
+            if ((row % 2 == 1) && (col % 2 == 1)) continue;
+
+            GameObject createdCellContainer = Instantiate(
                     _fieldCellContainer,
-                    new Vector3(cellPosition.x, cellPosition.y, 0.5f),
+                    new Vector3(cellPositions[i].x, cellPositions[i].y, 0.5f),
                     Quaternion.identity,
                     gameObject.transform
                 );
-                createdCellContainer.transform.localScale = new Vector2(cellSize, cellSize);
-                GameObject cell = createdCellContainer.transform.GetChild(0).gameObject;
-                cell.GetComponent<SpriteRenderer>().color = _secondaryColor;
-                isEvenCell = false;
-            } else
-            {
-                isEvenCell = true;
-            }
+            createdCellContainer.transform.localScale = new Vector2(cellSize, cellSize);
+            GameObject cell = createdCellContainer.transform.GetChild(0).gameObject;
+            cell.GetComponent<SpriteRenderer>().color = _secondaryColor;
         }
         
     }
