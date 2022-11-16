@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Field : MonoBehaviour
 {
-    [SerializeField] private int _size;
-    [SerializeField] private GameObject _fieldCell;
+    [SerializeField] public int _fieldSize;
+    [SerializeField] private GameObject _fieldCellContainer;
     [SerializeField] private Color _primaryColor;
     [SerializeField] private Color _secondaryColor;
 
-    private float GetCellSize()
+    public List<Vector2> cellPositions;
+
+    public float GetCellSize()
     {
         return 1f / _size;
     }
@@ -29,27 +31,33 @@ public class Field : MonoBehaviour
                 cellPositions.Add(NormalizeCellPosition(-0.5f + (float)j / _size, 0.5f - (float)i / _size));
             }
         }
-        return cellPositions;
+        return cellsPositions;
     }
 
-    void Start()
+    public Vector2 GetCellPosition(int x, int y) { return cellPositions[y * _fieldSize + x]; }
+
+    private void Awake()
     {
+        cellPositions = GetCellsPositions();
         gameObject.GetComponent<SpriteRenderer>().color = _primaryColor;
         float cellSize = GetCellSize();
-        List<Vector2> cellPositions = GetCellPositions();
-        int cellsCount = cellPositions.Count;
-        for (int i = 0; i < cellsCount; i++)
+
+        for(int i = 0; i < cellPositions.Count; i++)
         {
-            int row = i / _size + 1;
-            int col = i % _size;
+            int row = i / _fieldSize + 1;
+            int col = i % _fieldSize;
 
             if ((row % 2 == 0) && (col % 2 == 0)) continue;
             if ((row % 2 == 1) && (col % 2 == 1)) continue;
-
-            Vector2 cellPosition = cellPositions[i];
-            GameObject createdCell = Instantiate(_fieldCell, cellPosition, Quaternion.identity, transform);
-            createdCell.GetComponent<SpriteRenderer>().color = _secondaryColor;
-            createdCell.transform.localScale = new Vector3(cellSize, cellSize, 1);
+            GameObject createdCellContainer = Instantiate(
+                    _fieldCellContainer,
+                    new Vector3(cellPositions[i].x, cellPositions[i].y, 0.5f),
+                    Quaternion.identity,
+                    gameObject.transform
+                );
+            createdCellContainer.transform.localScale = new Vector2(cellSize, cellSize);
+            GameObject cell = createdCellContainer.transform.GetChild(0).gameObject;
+            cell.GetComponent<SpriteRenderer>().color = _secondaryColor;
         }
     }
 }
