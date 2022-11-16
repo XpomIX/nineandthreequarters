@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class field : MonoBehaviour
+public class Field : MonoBehaviour
 {
     [SerializeField] public int _fieldSize;
     [SerializeField] private GameObject _fieldCellContainer;
@@ -14,22 +13,22 @@ public class field : MonoBehaviour
 
     public float GetCellSize()
     {
-        return transform.localScale.x / _fieldSize;
+        return 1f / _size;
     }
-    public List<Vector2> GetCellsPositions()
+    private Vector2 NormalizeCellPosition(float x, float y)
     {
         float cellSize = GetCellSize();
-        Vector2 parentScale = transform.parent.transform.localScale;
-        Vector2 leftTopCornerPosition = new Vector2(
-            transform.position.x - parentScale.x / 2,
-            transform.position.y - parentScale.y / 2
-        );
-        List<Vector2> cellsPositions = new List<Vector2>();
-        for (int i = 0; i < _fieldSize; i++)
+        return new Vector2((x + cellSize / 2) * transform.parent.localScale.x, (y - cellSize / 2) * transform.parent.localScale.y);
+    }
+    public List<Vector2> GetCellPositions()
+    {
+        List<Vector2> cellPositions = new List<Vector2>();
+
+        for (int i = 0; i < _size; i++)
         {
-            for (int j = 0; j < _fieldSize; j++)
+            for (int j = 0; j < _size; j++)
             {
-                cellsPositions.Add(new Vector2(leftTopCornerPosition.x + cellSize * j * parentScale.x, leftTopCornerPosition.y + cellSize * (i + 1) * parentScale.y));
+                cellPositions.Add(NormalizeCellPosition(-0.5f + (float)j / _size, 0.5f - (float)i / _size));
             }
         }
         return cellsPositions;
@@ -50,7 +49,6 @@ public class field : MonoBehaviour
 
             if ((row % 2 == 0) && (col % 2 == 0)) continue;
             if ((row % 2 == 1) && (col % 2 == 1)) continue;
-
             GameObject createdCellContainer = Instantiate(
                     _fieldCellContainer,
                     new Vector3(cellPositions[i].x, cellPositions[i].y, 0.5f),
@@ -61,6 +59,5 @@ public class field : MonoBehaviour
             GameObject cell = createdCellContainer.transform.GetChild(0).gameObject;
             cell.GetComponent<SpriteRenderer>().color = _secondaryColor;
         }
-        
     }
 }
